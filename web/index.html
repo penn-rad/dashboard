@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-B2ootaw-.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-CxL0S8W7.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-D9fedIX3.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-BTCkDNvf.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-DU3aDxX5.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-CLVRCuM9.ttf" as="font" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        var scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          var element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          var hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          var newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((entries) => {
+          setHeight();
+        });
+        resizeObserver.observe(obj.contentWindow.document.body);
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <marimo-mode data-mode='read' hidden></marimo-mode>
+    <marimo-version data-version='0.10.14' hidden></marimo-version>
+    <marimo-user-config data-config='{"completion": {"activate_on_typing": true, "copilot": false}, "display": {"cell_output": "above", "theme": "light", "dataframes": "rich", "default_width": "medium", "code_editor_font_size": 14}, "formatting": {"line_length": 79}, "keymap": {"preset": "default", "overrides": {}}, "runtime": {"auto_instantiate": true, "auto_reload": "off", "on_cell_change": "autorun"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "package_management": {"manager": "pip"}, "server": {"browser": "default", "follow_symlink": false}}' data-overrides='{}' hidden></marimo-user-config>
+    <marimo-app-config data-config='{"width": "medium"}' hidden></marimo-app-config>
+    <marimo-server-token data-token='123' hidden></marimo-server-token>
+    <title>marimo</title>
+    <script type="module" crossorigin src="./assets/index-CXUFCwUc.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CiyYqgHW.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <marimo-code hidden="" data-show-code="false">import%20marimo%0A%0A__generated_with%20%3D%20%220.10.14%22%0Aapp%20%3D%20marimo.App(width%3D%22medium%22)%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20import%20pandas%20as%20pd%0A%20%20%20%20import%20json%0A%20%20%20%20import%20io%0A%20%20%20%20import%20pickle%0A%20%20%20%20import%20altair%20as%20alt%0A%20%20%20%20return%20alt%2C%20io%2C%20json%2C%20mo%2C%20pd%2C%20pickle%0A%0A%0A%40app.cell%0Adef%20_(mo)%3A%0A%20%20%20%20qg%20%3D%20mo.ui.file()%0A%20%20%20%20ps%20%3D%20mo.ui.file()%0A%20%20%20%20rs%20%3D%20mo.ui.file()%0A%20%20%20%20run_button%20%3D%20mo.ui.run_button()%0A%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23Upload%20files%3A%22)%2C%0A%20%20%20%20%20%20%20%20mo.vstack(%5B%22qgenda%20file%3A%22%2C%20qg%5D)%2C%0A%20%20%20%20%20%20%20%20mo.vstack(%5B%22powerscribe%20file%3A%22%2C%20ps%5D)%2C%0A%20%20%20%20%20%20%20%20mo.vstack(%5B%22resident%20file%3A%22%2C%20rs%5D)%2C%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23Once%20all%20of%20the%20files%20have%20been%20uploaded%2C%20click%20to%20run%22)%2C%0A%20%20%20%20%20%20%20%20run_button%0A%20%20%20%20%5D)%0A%20%20%20%20return%20ps%2C%20qg%2C%20rs%2C%20run_button%0A%0A%0A%40app.cell%0Adef%20_(io%2C%20pickle)%3A%0A%20%20%20%20def%20load_file(f)%3A%0A%20%20%20%20%20%20%20%20%23%20Access%20the%20first%20file%20in%20the%20list%20(assumes%20single%20file%20upload)%0A%20%20%20%20%20%20%20%20uploaded_file%20%3D%20f.value%5B0%5D%0A%0A%20%20%20%20%20%20%20%20%23%20Create%20an%20in-memory%20stream%20from%20the%20binary%20data%0A%20%20%20%20%20%20%20%20with%20io.BytesIO(uploaded_file.contents)%20as%20g%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%23%20Unpickle%20the%20DataFrame%0A%20%20%20%20%20%20%20%20%20%20%20%20loaded_df%20%3D%20pickle.load(g)%0A%0A%20%20%20%20%20%20%20%20return%20loaded_df%0A%20%20%20%20return%20(load_file%2C)%0A%0A%0A%40app.cell%0Adef%20_(load_file%2C%20ps%2C%20qg%2C%20rs%2C%20run_button)%3A%0A%20%20%20%20if%20run_button.value%3A%0A%20%20%20%20%20%20%20%20ps_df%20%3D%20load_file(ps)%0A%20%20%20%20%20%20%20%20qg_df%20%3D%20load_file(qg)%0A%20%20%20%20%20%20%20%20rs_df%20%3D%20load_file(rs)%0A%20%20%20%20return%20ps_df%2C%20qg_df%2C%20rs_df%0A%0A%0A%40app.cell%0Adef%20_(qg_df)%3A%0A%20%20%20%20%23%20Filter%20for%20specific%20shifts%0A%20%20%20%20weekday_shifts%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%22RES%20-%20Chest%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20Chest%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Cardiovascular%22%2C%0A%20%20%20%20%20%20%20%20%22RES-%20CMR%22%2C%0A%20%20%20%20%20%20%20%20%22AI%20RES%20-%20CT%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20CT%22%2C%0A%20%20%20%20%20%20%20%20%22AI%20RES%20-%20MRI%20PCAM%204%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20MR%2Fbody%22%2C%0A%20%20%20%20%20%20%20%20%22AI%20RES%20-%20US%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20US%22%2C%0A%20%20%20%20%20%20%20%20%22AI%20RES%20-%20Junior%20Fluoro%22%2C%0A%20%20%20%20%20%20%20%20%22AI%20RES%20-%20Senior%20Fluoro%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20FL%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20MSK%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20MSK%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Neuro%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20Neuro%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20IR%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20IR%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Nucs%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20Nucs%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PET%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20Cardiac%20Nucs%20PCAM%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20CHOP%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Breast%20HUP%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Breast%20PAH%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20VA%20General%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20VA%20Fluoro%22%2C%0A%20%20%20%20%5D%0A%0A%20%20%20%20off_shifts%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%22RES%20-%20Research%22%2C%0A%20%20%20%20%20%20%20%20%22VAC%20-%20Vacation%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Away%20Conference%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20DEPT%20-%20Personal%22%2C%0A%20%20%20%20%20%20%20%20%22DEPT%20-%20FMLA%22%0A%20%20%20%20%5D%0A%0A%20%20%20%20call_shifts%20%3D%20%5B%0A%20%20%20%20%20%20%20%20%22RES%20-%20Baby%20Call%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20HUP%20Nightfloat%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20Nightfloat%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20HUP%20Dayfloat%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20PAH%20Dayfloat%22%2C%0A%0A%20%20%20%20%20%20%20%20%22RES%20-%20Call%20PAH%20Swing%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Private%20Practice%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Presby%20Night%22%2C%0A%0A%20%20%20%20%20%20%20%20%22AI%20FEL%20-%20Body%20Call%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Call%20Body%20Wknd%22%2C%0A%20%20%20%20%20%20%20%20%22RES%20-%20Call%20Neuro%20Wknd%20(5pm-9pm)%22%2C%0A%20%20%20%20%5D%0A%0A%20%20%20%20rotation_schedule%20%3D%20qg_df%5B%0A%20%20%20%20%20%20%20%20(qg_df%5B'cancelled'%5D%20%3D%3D%20False)%20%26%0A%20%20%20%20%20%20%20%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20qg_df%5B'shift_name'%5D.isin(weekday_shifts)%20%26%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20~qg_df%5B'date'%5D.dt.dayofweek.isin(%5B5%2C%206%5D)%20%20%23%205%20and%206%20represent%20Saturday%20and%20Sunday%0A%20%20%20%20%20%20%20%20%20%20%20%20)%20%7C%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20qg_df%5B'shift_name'%5D.isin(call_shifts)%0A%20%20%20%20%20%20%20%20%20%20%20%20)%20%7C%20(%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20qg_df%5B'shift_name'%5D.isin(off_shifts)%0A%20%20%20%20%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20%5D%0A%0A%20%20%20%20%23%20filtered_schedule%20%3D%20filtered_schedule.sort_values(by%3D'date')%0A%0A%20%20%20%20%23%20%23%201.%20Filter%20out%20cancelled%20shifts%20and%20create%20a%20copy%0A%20%20%20%20%23%20f_df%20%3D%20qgenda_df%5Bqgenda_df%5B'cancelled'%5D%20%3D%3D%20False%5D.copy()%20%20%23%20Use%20.copy()%20here%0A%0A%20%20%20%20%23%202.%20Calculate%20the%20running%20count%20of%20days%20for%20each%20resident%20on%20each%20service%0A%20%20%20%20rotation_schedule.loc%5B%3A%2C%20'Day%20Count'%5D%20%3D%20rotation_schedule.groupby(%5B'staff_email'%2C%20'shift_name'%5D)%5B'date'%5D.rank(method%3D'dense'%2C%20ascending%3DTrue).astype(int)%0A%20%20%20%20return%20call_shifts%2C%20off_shifts%2C%20rotation_schedule%2C%20weekday_shifts%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20ps_df)%3A%0A%20%20%20%20procedures%20%3D%20mo.sql(%0A%20%20%20%20%20%20%20%20f%22%22%22%0A%20%20%20%20%20%20%20%20SELECT%0A%20%20%20%20%20%20%20%20%20%20%20%20ProcedureDescList%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20COUNT(*)%20AS%20ProcedureCount%0A%20%20%20%20%20%20%20%20FROM%0A%20%20%20%20%20%20%20%20%20%20%20%20ps_df%0A%20%20%20%20%20%20%20%20GROUP%20BY%0A%20%20%20%20%20%20%20%20%20%20%20%20ProcedureDescList%0A%20%20%20%20%20%20%20%20ORDER%20BY%0A%20%20%20%20%20%20%20%20%20%20%20%20ProcedureCount%20DESC%3B%0A%20%20%20%20%20%20%20%20%22%22%22%0A%20%20%20%20)%0A%20%20%20%20return%20(procedures%2C)%0A%0A%0A%40app.cell%0Adef%20_(mo%2C%20procedures%2C%20rs_df)%3A%0A%20%20%20%20selected_procedures%20%3D%20mo.ui.table(procedures)%0A%20%20%20%20selected_residents%20%3D%20mo.ui.table(rs_df)%0A%20%20%20%20next_run_button%20%3D%20mo.ui.run_button()%0A%0A%20%20%20%20mo.vstack(%5B%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%20Use%20this%20table%20to%20select%20which%20procedures%20you%20would%20like%20to%20analyze%20volume%20for%22)%2C%0A%20%20%20%20%20%20%20%20selected_procedures%2C%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%20Use%20this%20table%20to%20select%20which%20residents%20you%20would%20like%20to%20analyze%20volume%20for%22)%2C%0A%20%20%20%20%20%20%20%20selected_residents%2C%0A%20%20%20%20%20%20%20%20mo.md(%22%23%23%20Click%20this%20button%20once%20you've%20made%20your%20selections%22)%2C%0A%20%20%20%20%20%20%20%20next_run_button%0A%20%20%20%20%5D)%0A%20%20%20%20return%20next_run_button%2C%20selected_procedures%2C%20selected_residents%0A%0A%0A%40app.cell%0Adef%20_(%0A%20%20%20%20alt%2C%0A%20%20%20%20next_run_button%2C%0A%20%20%20%20ps_df%2C%0A%20%20%20%20selected_procedures%2C%0A%20%20%20%20selected_residents%2C%0A)%3A%0A%20%20%20%20if%20next_run_button.value%3A%0A%20%20%20%20%20%20%20%20filtered_df%20%3D%20ps_df%0A%20%20%20%20%20%20%20%20%23%20Display%20the%20updated%20'reports'%20DataFrame%0A%20%20%20%20%20%20%20%20filtered_df%20%3D%20filtered_df%5Bfiltered_df%5B%22ProcedureDescList%22%5D.isin(selected_procedures.value%5B%22ProcedureDescList%22%5D)%5D%0A%20%20%20%20%20%20%20%20filtered_df%20%3D%20filtered_df%5Bfiltered_df%5B%22DictatorAcctID%22%5D.isin(selected_residents.value%5B%22powerscribe%22%5D)%5D%0A%0A%20%20%20%20%20%20%20%20%23%20Group%20by%20DictatorAcctID%20and%20ProcedureDescList%2C%20then%20count%20occurrences%0A%20%20%20%20%20%20%20%20studies_per_person%20%3D%20filtered_df.groupby(%5B%22DictatorAcctID%22%2C%20%22ProcedureDescList%22%5D).size().reset_index(name%3D%22Count%22)%0A%0A%20%20%20%20%20%20%20%20%23%20Create%20an%20Altair%20chart%0A%20%20%20%20%20%20%20%20chart%20%3D%20alt.Chart(studies_per_person).mark_bar().encode(%0A%20%20%20%20%20%20%20%20%20%20%20%20y%3Dalt.Y(%22DictatorAcctID%3AO%22%2C%20title%3D%22Person%20(DictatorAcctID)%22)%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20x%3Dalt.X(%22sum(Count)%3AQ%22%2C%20title%3D%22Number%20of%20Studies%22)%2C%20%20%23%20Sum%20counts%20for%20each%20study%20type%0A%20%20%20%20%20%20%20%20%20%20%20%20color%3Dalt.Color(%22ProcedureDescList%3AN%22%2C%20title%3D%22Study%20Type%22%2C%20legend%3DNone)%2C%20%20%23%20Differentiate%20by%20study%20type%0A%20%20%20%20%20%20%20%20%20%20%20%20tooltip%3D%5B%22DictatorAcctID%22%2C%20%22ProcedureDescList%22%2C%20%22sum(Count)%22%5D%2C%0A%20%20%20%20%20%20%20%20).properties(%0A%20%20%20%20%20%20%20%20%20%20%20%20title%3D%22Study%20Types%20Per%20Person%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20width%3D1200%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20height%3D400%2C%0A%20%20%20%20%20%20%20%20).interactive()%0A%20%20%20%20return%20chart%2C%20filtered_df%2C%20studies_per_person%0A%0A%0A%40app.cell%0Adef%20_(chart%2C%20mo)%3A%0A%20%20%20%20%23%20Display%20the%20chart%20in%20Marimo%0A%20%20%20%20mo.ui.altair_chart(chart)%0A%20%20%20%20return%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
