@@ -1,11 +1,11 @@
 import marimo
 
-__generated_with = "0.8.22"
+__generated_with = "0.10.14"
 app = marimo.App(width="medium")
 
 
 @app.cell
-def __():
+def _():
     import marimo as mo
     import pandas as pd
     import json
@@ -16,7 +16,7 @@ def __():
 
 
 @app.cell
-def __(mo):
+def _(mo):
     qg = mo.ui.file()
     ps = mo.ui.file()
     rs = mo.ui.file()
@@ -34,7 +34,7 @@ def __(mo):
 
 
 @app.cell
-def __(io, pd, pickle):
+def _(io, pd, pickle):
     def load_file(f):
         # Access the first file in the list (assumes single file upload)
         uploaded_file = f.value[0]
@@ -78,7 +78,7 @@ def __(io, pd, pickle):
             "RES - VA General",
             "RES - VA Fluoro",
         ]
-        
+
         off_shifts = [
             "RES - Research",
             "VAC - Vacation",
@@ -86,23 +86,23 @@ def __(io, pd, pickle):
             "RES - DEPT - Personal",
             "DEPT - FMLA"
         ]
-        
+
         call_shifts = [
             "RES - Baby Call",
             "RES - HUP Nightfloat",
             "RES - PAH Nightfloat",
             "RES - HUP Dayfloat",
             "RES - PAH Dayfloat",
-        
+
             "RES - Call PAH Swing",
             "RES - Private Practice",
             "RES - Presby Night",
-        
+
             "AI FEL - Body Call",
             "RES - Call Body Wknd",
             "RES - Call Neuro Wknd (5pm-9pm)",
         ]
-        
+
         rotation_schedule = qgenda_df[
             (qgenda_df['cancelled'] == False) &
             (
@@ -118,7 +118,7 @@ def __(io, pd, pickle):
         ]
 
         rotation_schedule.loc[:, 'Day Count'] = rotation_schedule.groupby(['staff_email', 'shift_name'])['date'].rank(method='dense', ascending=True).astype(int)
-        
+
         return rotation_schedule
 
     def create_combined_studies_by_shift_df(rotation_df, powerscribe_df, resident_df):
@@ -135,7 +135,7 @@ def __(io, pd, pickle):
 
 
 @app.cell
-def __(
+def _(
     create_combined_studies_by_shift_df,
     load_file,
     mo,
@@ -174,7 +174,7 @@ def __(
 
 
 @app.cell
-def __(mo, selected_residents):
+def _(mo, selected_residents):
     mo.vstack([
         mo.md("## Use this table to select which residents you would like to analyze volume for"),
         selected_residents
@@ -183,7 +183,7 @@ def __(mo, selected_residents):
 
 
 @app.cell
-def __(analysis_selector, mo, selected_residents):
+def _(analysis_selector, mo, selected_residents):
     def _():
         if len(selected_residents.value) > 0:
             return analysis_selector
@@ -194,7 +194,7 @@ def __(analysis_selector, mo, selected_residents):
 
 
 @app.cell
-def __(analysis_selector, mo, ps_df, selected_residents):
+def _(analysis_selector, mo, ps_df, selected_residents):
     def _create_total_volume_analysis_ui():
         if len(selected_residents.value) > 0 and analysis_selector.value == "Total Volume":
             selected_procedures = mo.ui.table(ps_df["ProcedureDescList"].value_counts().reset_index())
@@ -207,7 +207,7 @@ def __(analysis_selector, mo, ps_df, selected_residents):
             ]), selected_procedures, total_volume_run_button
         else:
             return mo.md(""), None, None
-            
+
     total_volume_analysis_ui, selected_procedures, total_volume_run_button = _create_total_volume_analysis_ui()
 
     total_volume_analysis_ui
@@ -219,7 +219,7 @@ def __(analysis_selector, mo, ps_df, selected_residents):
 
 
 @app.cell
-def __(
+def _(
     alt,
     mo,
     ps_df,
@@ -233,10 +233,10 @@ def __(
             # Display the updated 'reports' DataFrame
             filtered_df = filtered_df[filtered_df["ProcedureDescList"].isin(selected_procedures.value["ProcedureDescList"])]
             filtered_df = filtered_df[filtered_df["DictatorAcctID"].isin(selected_residents.value["powerscribe"])]
-        
+
             # Group by DictatorAcctID and ProcedureDescList, then count occurrences
             studies_per_person = filtered_df.groupby(["DictatorAcctID", "ProcedureDescList"]).size().reset_index(name="Count")
-        
+
             # Create an Altair chart
             chart = alt.Chart(studies_per_person).mark_bar().encode(
                 y=alt.Y("DictatorAcctID:O", title="Person (DictatorAcctID)"),
@@ -257,7 +257,7 @@ def __(
 
 
 @app.cell
-def __():
+def _():
     # # cell to merge the different dataframes into a single dataframe that is easier to use for downstream tasks
 
     # _rotation_schedule = rotation_schedule.copy()
@@ -272,13 +272,7 @@ def __():
 
 
 @app.cell
-def __(mo):
-    mo.md(r"""# Visualizing Rotation Volumes by Day""")
-    return
-
-
-@app.cell
-def __(analysis_selector, mo, rotation_schedule):
+def _(analysis_selector, mo, rotation_schedule):
     def _create_shift_selector_ui():
         if analysis_selector.value == "Per Rotation Volume":
             shift_picklist = mo.ui.table(list(rotation_schedule['shift_name'].drop_duplicates()), selection='single')
@@ -296,21 +290,21 @@ def __(analysis_selector, mo, rotation_schedule):
 
 
 @app.cell
-def __(combined_df, mo, shift_picklist):
+def _(combined_df, mo, shift_picklist):
     # Create a function to filter the dataframe and return the filtered table
     def _create_procedure_picklist(combined_df, shift_picklist):
         if shift_picklist:
             if not shift_picklist.value:
                 return mo.md("Please select a shift"), None
-        
+
             # Filter the dataframe
             filtered_df = combined_df[
                 (combined_df['shift_name'] == shift_picklist.value[0])
             ]
-        
+
             # Create the procedure picklist table
             procedure_table = mo.ui.table(filtered_df['ProcedureDescList'].value_counts().reset_index())
-        
+
             return mo.vstack([
                 mo.md("### Select which procedures to analyze volumes for:"),
                 mo.md("The procedures are sorted by frequency filtered by volume read by residents on days they were on this rotation. Note that there is some data contamination from days that they had evening calls on top of their day shift. This table allows you to do some manual filtering to remove some of that contamination."),
@@ -328,7 +322,7 @@ def __(combined_df, mo, shift_picklist):
 
 
 @app.cell
-def __(
+def _(
     alt,
     combined_df,
     mo,
@@ -360,7 +354,7 @@ def __(
 
 
 @app.cell
-def __(chrt, mo):
+def _(chrt, mo):
     selection = mo.ui.table(chrt.value, selection='single')
     def _():
         if len(chrt.value) > 1:
@@ -370,7 +364,7 @@ def __(chrt, mo):
 
 
 @app.cell
-def __(chrt, combined_df, selection, shift_picklist):
+def _(chrt, combined_df, selection, shift_picklist):
     def _():
         if len(chrt.value) == 1:
             selected_row = chrt.value.iloc[0]
