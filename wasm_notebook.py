@@ -1,7 +1,7 @@
 import marimo
 
-__generated_with = "0.10.14"
-app = marimo.App(width="medium")
+__generated_with = "0.11.7"
+app = marimo.App(width="full")
 
 
 @app.cell
@@ -116,8 +116,6 @@ def _(io, pd, pickle):
                 )
             )
         ]
-
-        rotation_schedule.loc[:, 'Day Count'] = rotation_schedule.groupby(['staff_email', 'shift_name'])['date'].rank(method='dense', ascending=True).astype(int)
 
         return rotation_schedule
 
@@ -275,10 +273,10 @@ def _():
 def _(analysis_selector, mo, rotation_schedule):
     def _create_shift_selector_ui():
         if analysis_selector.value == "Per Rotation Volume":
-            shift_picklist = mo.ui.table(list(rotation_schedule['shift_name'].drop_duplicates()), selection='single')
+            shift_picklist = mo.ui.table(list(rotation_schedule['shift_name'].drop_duplicates()))
 
             return mo.vstack([
-                mo.md("### Select which shifts to analyze (only one shift can be selected at a time):"),
+                mo.md("### Select which shifts to analyze:"),
                 shift_picklist
             ]), shift_picklist
         else:
@@ -299,7 +297,7 @@ def _(combined_df, mo, shift_picklist):
 
             # Filter the dataframe
             filtered_df = combined_df[
-                (combined_df['shift_name'] == shift_picklist.value[0])
+                combined_df['shift_name'].isin([_shift["value"] for _shift in shift_picklist.value])
             ]
 
             # Create the procedure picklist table
@@ -322,35 +320,133 @@ def _(combined_df, mo, shift_picklist):
 
 
 @app.cell
+def _(combined_df, mo, selected_residents, shift_picklist):
+    # Create a function to filter the dataframe and return the filtered table
+    def _create_resident_highlight_picklist(combined_df, shift_picklist):
+        if shift_picklist:
+            if not shift_picklist.value:
+                return None, None
+
+            # Residents to highlight
+            resident_highlight_table = mo.ui.table(selected_residents.value["email"].tolist(), selection='single')
+
+            return mo.vstack([
+                mo.md("### Select which residents to highlight:"),
+                resident_highlight_table
+            ]), resident_highlight_table
+        else:
+            return mo.md(""), None
+
+    # Use the function and store the result in a variable
+    resident_highlight_picklist_ui, resident_highlight_picklist = _create_resident_highlight_picklist(combined_df, shift_picklist)
+    return resident_highlight_picklist, resident_highlight_picklist_ui
+
+
+@app.cell
 def _(
     alt,
     combined_df,
     mo,
     procedure_picklist,
+    resident_highlight_picklist,
     selected_residents,
     shift_picklist,
 ):
-    _filtered_volumes = combined_df[
-      (combined_df['shift_name'] == shift_picklist.value[0]) &
-      (combined_df['email'].isin(selected_residents.value["email"]) &
-      (combined_df['ProcedureDescList'].isin(procedure_picklist.value['ProcedureDescList'])))
+    filtered_df = combined_df[
+      (combined_df['shift_name'].isin([_shift["value"] for _shift in shift_picklist.value])) &
+      (combined_df['email'].isin(selected_residents.value["email"])) #&
+      # (combined_df['ProcedureDescList'].isin(procedure_picklist.value['ProcedureDescList'])))
+    ].copy()
+
+    filtered_df.loc[:, 'Day Count'] = filtered_df.groupby(['email'])['date'].rank(method='dense', ascending=True).astype(int)
+
+    _filtered_volumes = filtered_df[
+      (filtered_df['ProcedureDescList'].isin(procedure_picklist.value['ProcedureDescList']))
     ].groupby(["email", "Day Count"], as_index=False).size()
+
+    # List of residents to highlight
+    highlight_residents = resident_highlight_picklist.value
+
+    # Add a new column that marks if a resident should be highlighted
+    _filtered_volumes['highlight'] = _filtered_volumes['email'].apply(lambda x: 'selected' if x in highlight_residents else 'normal')
+
+    _filtered_volumes[_filtered_volumes["email"].isin(highlight_residents)]
 
     # Create Altair scatter plot
     scatter = alt.Chart(_filtered_volumes).mark_circle(size=100).encode(
-        x=alt.X("Day Count:O", title="Day #"),  # X-axis: Day Count
+        x=alt.X("Day Count:Q", title="Day #"),  # X-axis: Day Count
         y=alt.Y("size:Q", title="# Studies Read"),  # Y-axis: Number of Studies
-        color=alt.Color("email:N", title="Resident", legend=None),  # Color by Resident
+        color=alt.Color("email:N", title="Resident", legend=None),
+        stroke=alt.Stroke("highlight:N", scale=alt.Scale(domain=["normal", "selected"], range=["transparant", "black"]), legend=None),
+        strokeWidth=alt.StrokeWidth("highlight:N", scale=alt.Scale(domain=["normal", "selected"], range=[0.0, 3.0]), legend=None),
+        size=alt.Size("highlight:N", scale=alt.Scale(domain=["normal", "selected"], range=[100, 100]), legend=None),  # Larger size for highlighted residents
         tooltip=["email", "Day Count", "size"],  # Tooltip with details
     ).properties(
         width=800,
         height=400,
         title="# of Filtered Studies Read by Selected Resident(s) on Each Day of Selected Rotation"
-    ).interactive()
+    )
 
     chrt = mo.ui.altair_chart(scatter)
-    chrt
-    return chrt, scatter
+    return chrt, filtered_df, highlight_residents, scatter
+
+
+@app.cell
+def _(chrt, mo, resident_highlight_picklist_ui):
+    mo.hstack([
+        resident_highlight_picklist_ui,
+        chrt
+    ], widths=[1, 9])
+    return
+
+
+@app.cell
+def _():
+    # _filtered_volumes = combined_df[
+    #   (combined_df['shift_name'].isin([_shift["value"] for _shift in shift_picklist.value])) &
+    #   (combined_df['email'].isin(selected_residents.value["email"]) &
+    #   (combined_df['ProcedureDescList'].isin(procedure_picklist.value['ProcedureDescList'])))
+    # ].groupby(["email", "Day Count"], as_index=False).size()
+
+    # # List of residents to highlight
+    # highlight_residents = ['Vedant.Acharya@Pennmedicine.upenn.edu']  # Replace with actual emails
+
+    # # Add a new column that marks if a resident should be highlighted
+    # _filtered_volumes['highlight'] = _filtered_volumes['email'].apply(lambda x: 'highlighted' if x in highlight_residents else 'normal')
+
+    # # Create Altair scatter plot
+    # scatter = alt.Chart(_filtered_volumes).mark_circle(size=100).encode(
+    #     x=alt.X("Day Count:O", title="Day #"),  # X-axis: Day Count
+    #     y=alt.Y("size:Q", title="# Studies Read"),  # Y-axis: Number of Studies
+    #     color=alt.Color("highlight:N", scale=alt.Scale(domain=["normal", "highlighted"], range=["gray", "red"]), title="Resident Highlight"),
+    #     size=alt.Size("highlight:N", scale=alt.Scale(domain=["normal", "highlighted"], range=[100, 200])),  # Larger size for highlighted residents
+    #     tooltip=["email", "Day Count", "size"],  # Tooltip with details
+    # ).properties(
+    #     width=800,
+    #     height=400,
+    #     title="# of Filtered Studies Read by Selected Resident(s) on Each Day of Selected Rotation"
+    # ).interactive()
+
+    # chrt = mo.ui.altair_chart(scatter)
+    # chrt
+
+
+
+    # # # Create Altair scatter plot
+    # # scatter = alt.Chart(_filtered_volumes).mark_circle(size=100).encode(
+    # #     x=alt.X("Day Count:O", title="Day #"),  # X-axis: Day Count
+    # #     y=alt.Y("size:Q", title="# Studies Read"),  # Y-axis: Number of Studies
+    # #     color=alt.Color("email:N", title="Resident", legend=None),  # Color by Resident
+    # #     tooltip=["email", "Day Count", "size"],  # Tooltip with details
+    # # ).properties(
+    # #     width=800,
+    # #     height=400,
+    # #     title="# of Filtered Studies Read by Selected Resident(s) on Each Day of Selected Rotation"
+    # # ).interactive()
+
+    # # chrt = mo.ui.altair_chart(scatter)
+    # # chrt
+    return
 
 
 @app.cell
@@ -364,25 +460,50 @@ def _(chrt, mo):
 
 
 @app.cell
-def _(chrt, combined_df, selection, shift_picklist):
+def _(chrt, filtered_df, selection, shift_picklist):
     def _():
         if len(chrt.value) == 1:
             selected_row = chrt.value.iloc[0]
-            return combined_df[
-                (combined_df['shift_name'] == shift_picklist.value[0]) &
-                (combined_df['email'] == selected_row['email']) &
-                (combined_df['Day Count'] == selected_row['Day Count'])
+            return filtered_df[
+                (filtered_df['shift_name'].isin([_shift["value"] for _shift in shift_picklist.value])) &
+                (filtered_df['email'] == selected_row['email']) &
+                (filtered_df['Day Count'] == selected_row['Day Count'])
             ]
         elif len(chrt.value) > 1 and len(selection.value) == 1:
             selected_row = selection.value.iloc[0]
-            return combined_df[
-                (combined_df['shift_name'] == shift_picklist.value[0]) &
-                (combined_df['email'] == selected_row['email']) &
-                (combined_df['Day Count'] == selected_row['Day Count'])
+            return filtered_df[
+                (filtered_df['shift_name'].isin([_shift["value"] for _shift in shift_picklist.value])) &
+                (filtered_df['email'] == selected_row['email']) &
+                (filtered_df['Day Count'] == selected_row['Day Count'])
             ]
         else:
             return "please select a point"
     _()
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
     return
 
 
